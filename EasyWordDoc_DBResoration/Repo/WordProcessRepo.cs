@@ -35,8 +35,7 @@ namespace EasyWordDoc_DBResoration.Repo
                 
             }
             SqlCommand cmd = new SqlCommand();
-            con.Open();
-            cmd.Connection = con;
+
             cmd.CommandText = "select FileId from UploadedQuestionFile order by FileId desc";
             SqlDataReader dr = cmd.ExecuteReader();
             while (dr.Read())
@@ -71,7 +70,7 @@ namespace EasyWordDoc_DBResoration.Repo
                 obj.Topic = reader.GetString(8);
                 obj.SheetType = reader.GetString(9);
                 obj.ImageList = GetImages(obj.Qid);
-                obj.XpsByteData = GetXpsByteData(obj.Qid);
+                obj.XpsByteData = GetXpsByteData(gc, obj.Qid);
                 toReturn.Add(obj);
             }
             return toReturn;
