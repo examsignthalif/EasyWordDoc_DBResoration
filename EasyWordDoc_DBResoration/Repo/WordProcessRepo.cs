@@ -29,34 +29,22 @@ namespace EasyWordDoc_DBResoration.Repo
             }
             return toReturn;
         }
-        public static int GetNewQuestionId()
-        {
-            int NewQuestionId = 0;
-            using (SqlConnection con = new SqlConnection(ConnectionString))
-            {
-                SqlCommand cmd = new SqlCommand();
-                con.Open();
-                cmd.Connection = con;
-                cmd.CommandText = "select count(*) from Questions";
-                NewQuestionId = Convert.ToInt32(cmd.ExecuteScalar()) + 1;
-            }
-            return NewQuestionId;
-        }
         public static int GetNewQuestionFileId()
         {
             int toReturn = 0;
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
-                SqlCommand cmd = new SqlCommand();
-                con.Open();
-                cmd.Connection = con;
-                cmd.CommandText = "select FileId from UploadedQuestionFile order by FileId desc";
-                SqlDataReader dr = cmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    toReturn = dr.GetInt32(0);
-                    break;
-                }
+                
+            }
+            SqlCommand cmd = new SqlCommand();
+            con.Open();
+            cmd.Connection = con;
+            cmd.CommandText = "select FileId from UploadedQuestionFile order by FileId desc";
+            SqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                toReturn = dr.GetInt32(0);
+                break;
             }
             return (toReturn + 1);
         }
