@@ -3,6 +3,7 @@ using EasyWordDoc_DBResoration.Repo;
 using EasyWordDoc_DBResoration.Tools;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,13 +12,19 @@ namespace EasyWordDoc_DBResoration
 {
     class Program
     {
+        static string ConnectionString = "Data Source=.;Initial Catalog=WordProcess;Integrated Security=True";
+        static string ConnectionString2 = "Data Source=.;Initial Catalog=WordProcessNew;Integrated Security=True";
+        static SqlConnection con1 = new SqlConnection(ConnectionString);
+        static SqlConnection con2 = new SqlConnection(ConnectionString2);
+
         static List<TestModel> TestList = new List<TestModel>();
         static void Main(string[] args)
         {
-            
+            Process();
+            Console.ReadKey();
         }
 
-        void Process()
+        static void Process()
         {
             // 1. Get all TestId for a class : 7
             // 2. Now get all Question for TestId list.
@@ -33,20 +40,20 @@ namespace EasyWordDoc_DBResoration
             CollectQuestion(5);
             ReStoreProcess();
         }
-        void CollectQuestion(int givenGrade)
+        static void CollectQuestion(int givenGrade)
         {
-            List<string> TestIdList = WordProcessRepo.GetAllTestIdForGrade(givenGrade);
+            List<string> TestIdList = WordProcessRepo.GetAllTestIdForGrade(con1, givenGrade);
             foreach (string testId in TestIdList)
             {
                 TestModel obj = new TestModel();
                 obj.TestID = testId;
-                obj.QuestionList = WordProcessRepo.GetAllQuestionForTestId(testId);
+                obj.QuestionList = WordProcessRepo.GetAllQuestionForTestId(con1, testId);
 
                 TestList.Add(obj);
             }
         }
 
-        void ReStoreProcess()
+        static void ReStoreProcess()
         {
             List<string> failedTestId = new List<string>();
             foreach(TestModel T_Item in TestList)

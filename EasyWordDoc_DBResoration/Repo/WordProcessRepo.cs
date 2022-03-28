@@ -11,11 +11,12 @@ namespace EasyWordDoc_DBResoration.Repo
     public class WordProcessRepo
     {
         static string ConnectionString = "Data Source=.;Initial Catalog=WordProcess;Integrated Security=True";
+        static string ConnectionString2 = "Data Source=.;Initial Catalog=WordProcessNew;Integrated Security=True";
 
-        public static List<string> GetAllTestIdForGrade(int grade)
+        public static List<string> GetAllTestIdForGrade(SqlConnection gc, int grade)
         {
             List<string> toReturn = new List<string>();
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = gc)
             {
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
@@ -61,13 +62,12 @@ namespace EasyWordDoc_DBResoration.Repo
         }
 
 
-        public static List<QuestionModel> GetAllQuestionForTestId(string testId)
+        public static List<QuestionModel> GetAllQuestionForTestId(SqlConnection gc, string testId)
         {
             List<QuestionModel> toReturn = new List<QuestionModel>();
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = gc)
             {
                 SqlCommand cmd = new SqlCommand();
-                con.Open();
                 cmd.Connection = con;
                 cmd.CommandText = "select Qid, Question, Hasimage, Subject, SClass, QType, Marks, QDesc, Topic, SheetType from Questions where Qid in (select QID from TestInfo where TestId = '" + testId + "')";
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -136,7 +136,7 @@ namespace EasyWordDoc_DBResoration.Repo
         //New Database Insert
         public static void InsertQuestionItem(QuestionModel question)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(ConnectionString2))
             {
                 SqlCommand cmd = new SqlCommand();
                 con.Open();
@@ -159,7 +159,7 @@ namespace EasyWordDoc_DBResoration.Repo
         {
             foreach (ImageModel image in question.ImageList)
             {
-                using (SqlConnection con = new SqlConnection(ConnectionString))
+                using (SqlConnection con = new SqlConnection(ConnectionString2))
                 {
                     SqlCommand cmd = new SqlCommand();
                     con.Open();
@@ -174,7 +174,7 @@ namespace EasyWordDoc_DBResoration.Repo
         }
         public static void InsertXpsItem(QuestionModel question)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(ConnectionString2))
             {
                 SqlCommand cmd = new SqlCommand();
                 con.Open();
@@ -187,7 +187,7 @@ namespace EasyWordDoc_DBResoration.Repo
         }
         public static bool InsertQuestionOrigin(string fileId, int qid)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(ConnectionString2))
             {
                 SqlCommand cmd = new SqlCommand();
                 con.Open();
@@ -205,7 +205,7 @@ namespace EasyWordDoc_DBResoration.Repo
         }
         public static void InsertTestInfo(string newTestId, string grade, string subject, int qid)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(ConnectionString2))
             {
                 SqlCommand cmd = new SqlCommand();
                 con.Open();
@@ -220,7 +220,7 @@ namespace EasyWordDoc_DBResoration.Repo
         }
         public static void InsertIsHeadingUpdate(string fileId, bool status)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(ConnectionString2))
             {
                 SqlCommand cmd = new SqlCommand();
                 con.Open();
@@ -233,7 +233,7 @@ namespace EasyWordDoc_DBResoration.Repo
         }
         public static void BackUpQuestionFile(int grade, string subject, string fileName, byte[] fileBytes)
         {
-            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlConnection con = new SqlConnection(ConnectionString2))
             {
                 SqlCommand cmd = new SqlCommand();
                 con.Open();
