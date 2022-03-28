@@ -45,12 +45,12 @@ namespace EasyWordDoc_DBResoration
         }
         static void CollectQuestion(int givenGrade)
         {
-            List<string> TestIdList = WordProcessRepo.GetAllTestIdForGrade(con1, givenGrade);
+            List<string> TestIdList = WordProcessRepo.GetAllTestIdForGrade(givenGrade);
             foreach (string testId in TestIdList)
             {
                 TestModel obj = new TestModel();
                 obj.TestID = testId;
-                obj.QuestionList = WordProcessRepo.GetAllQuestionForTestId(con1, testId);
+                obj.QuestionList = WordProcessRepo.GetAllQuestionForTestId(testId);
 
                 TestList.Add(obj);
             }

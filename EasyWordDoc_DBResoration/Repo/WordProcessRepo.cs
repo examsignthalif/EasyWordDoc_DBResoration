@@ -13,17 +13,19 @@ namespace EasyWordDoc_DBResoration.Repo
         static string ConnectionString = "Data Source=.;Initial Catalog=WordProcess;Integrated Security=True";
         static string ConnectionString2 = "Data Source=.;Initial Catalog=WordProcessNew;Integrated Security=True";
 
-        public static List<string> GetAllTestIdForGrade(SqlConnection gc, int grade)
+        public static List<string> GetAllTestIdForGrade(int grade)
         {
             List<string> toReturn = new List<string>();
-            SqlConnection con = gc;
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
-            cmd.CommandText = "select Distinct TestId from TestInfo where QID in (select Qid from Questions where SClass = " + grade + ")";
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using(SqlConnection con = new SqlConnection(ConnectionString))
             {
-                toReturn.Add(reader.GetString(0));
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
+                cmd.CommandText = "select Distinct TestId from TestInfo where QID in (select Qid from Questions where SClass = " + grade + ")";
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    toReturn.Add(reader.GetString(0));
+                }
             }
             return toReturn;
         }
@@ -47,67 +49,72 @@ namespace EasyWordDoc_DBResoration.Repo
         }
 
 
-        public static List<QuestionModel> GetAllQuestionForTestId(SqlConnection gc, string testId)
+        public static List<QuestionModel> GetAllQuestionForTestId(string testId)
         {
             List<QuestionModel> toReturn = new List<QuestionModel>();
 
-            SqlConnection con = gc;
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
-            cmd.CommandText = "select Qid, Question, Hasimage, Subject, SClass, QType, Marks, QDesc, Topic, SheetType from Questions where Qid in (select QID from TestInfo where TestId = '" + testId + "')";
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using (SqlConnection con = new SqlConnection(ConnectionString))
             {
-                QuestionModel obj = new QuestionModel();
-                obj.Qid = reader.GetInt32(0);
-                obj.Question = reader.GetString(1);
-                obj.HasImage = reader.GetBoolean(2);
-                obj.Subject = reader.GetString(3);
-                obj.Grade = reader.GetString(4);
-                obj.QType = reader.GetString(5);
-                obj.Mark = reader.GetInt32(6);
-                obj.Heading = reader.GetString(7);
-                obj.Topic = reader.GetString(8);
-                obj.SheetType = reader.GetString(9);
-                obj.ImageList = GetImages(obj.Qid);
-                obj.XpsByteData = GetXpsByteData(gc, obj.Qid);
-                toReturn.Add(obj);
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
+                cmd.CommandText = "select Qid, Question, Hasimage, Subject, SClass, QType, Marks, QDesc, Topic, SheetType from Questions where Qid in (select QID from TestInfo where TestId = '" + testId + "')";
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    QuestionModel obj = new QuestionModel();
+                    obj.Qid = reader.GetInt32(0);
+                    obj.Question = reader.GetString(1);
+                    obj.HasImage = reader.GetBoolean(2);
+                    obj.Subject = reader.GetString(3);
+                    obj.Grade = reader.GetString(4);
+                    obj.QType = reader.GetString(5);
+                    obj.Mark = reader.GetInt32(6);
+                    obj.Heading = reader.GetString(7);
+                    obj.Topic = reader.GetString(8);
+                    obj.SheetType = reader.GetString(9);
+                    obj.ImageList = GetImages(obj.Qid);
+                    obj.XpsByteData = GetXpsByteData(obj.Qid);
+                    toReturn.Add(obj);
+                }
             }
             return toReturn;
         }
         private static List<ImageModel> GetImages(int qid)
         {
             List<ImageModel> toReturn = new List<ImageModel>();
-            SqlConnection con = new SqlConnection(ConnectionString);
-            SqlCommand cmd = new SqlCommand();
-            con.Open();
-            cmd.Connection = con;
-            cmd.CommandText = "select Qid, imagenumber, ImageByte from imagetable where Qid = " + qid + "";
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using (SqlConnection con = new SqlConnection(ConnectionString))
             {
-                ImageModel obj = new ImageModel();
-                obj.Qid = reader.GetInt32(0);
-                obj.ImageNumber = reader.GetString(1);
-                obj.ImageByteData = (byte[])reader.GetValue(2);
-                toReturn.Add(obj);
+                SqlCommand cmd = new SqlCommand();
+                con.Open();
+                cmd.Connection = con;
+                cmd.CommandText = "select Qid, imagenumber, ImageByte from imagetable where Qid = " + qid + "";
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    ImageModel obj = new ImageModel();
+                    obj.Qid = reader.GetInt32(0);
+                    obj.ImageNumber = reader.GetString(1);
+                    obj.ImageByteData = (byte[])reader.GetValue(2);
+                    toReturn.Add(obj);
+                }
             }
             return toReturn;
         }
-        static byte[] GetXpsByteData(SqlConnection gc, int qid)
+        static byte[] GetXpsByteData(int qid)
         {
             byte[] toReturn = new byte[0];
-
-            SqlConnection con = gc;
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = con;
-            cmd.CommandText = "select XpsFile from Xpstable where Qid = " + qid + "";
-            try
+            using (SqlConnection con = new SqlConnection())
             {
-                toReturn = (byte[])cmd.ExecuteScalar();
-            }
-            catch (Exception ex)
-            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
+                cmd.CommandText = "select XpsFile from Xpstable where Qid = " + qid + "";
+                try
+                {
+                    toReturn = (byte[])cmd.ExecuteScalar();
+                }
+                catch (Exception ex)
+                {
+                }
             }
             return toReturn;
         }
