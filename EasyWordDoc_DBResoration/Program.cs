@@ -67,7 +67,7 @@ namespace EasyWordDoc_DBResoration
                     {
                         WordProcessRepo.InsertQuestionItem(con2, Q_Item);
                         WordProcessRepo.InsertImagesItem(con2, Q_Item);
-                        if (Q_Item.XpsByteData.Length > 0)
+                        if (Q_Item.XpsByteData != null)
                             WordProcessRepo.InsertXpsItem(con2, Q_Item);
                         WordProcessRepo.InsertQuestionOrigin(con2, T_Item.TestID, Q_Item.Qid);
                         WordProcessRepo.InsertTestInfo(con2, T_Item.TestID, Q_Item.Grade, Q_Item.Subject, Q_Item.Qid);

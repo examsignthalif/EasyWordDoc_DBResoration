@@ -26,6 +26,7 @@ namespace EasyWordDoc_DBResoration.Model
         public QuestionModel()
         {
             ImageList = new List<ImageModel>();
+            XpsByteData = new byte[0];
         }
     }
 }

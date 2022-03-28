@@ -88,7 +88,6 @@ namespace EasyWordDoc_DBResoration.Repo
             {
                 con.Open();
                 SqlCommand cmd = new SqlCommand();
-                con.Open();
                 cmd.Connection = con;
                 cmd.CommandText = "select Qid, imagenumber, ImageByte from imagetable where Qid = " + qid + "";
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -106,7 +105,7 @@ namespace EasyWordDoc_DBResoration.Repo
         static byte[] GetXpsByteData(int qid)
         {
             byte[] toReturn = new byte[0];
-            using (SqlConnection con = new SqlConnection())
+            using (SqlConnection con = new SqlConnection(ConnectionString))
             {
                 con.Open();
                 SqlCommand cmd = new SqlCommand();
@@ -130,7 +129,7 @@ namespace EasyWordDoc_DBResoration.Repo
             SqlConnection con = gc;
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = con;
-            cmd.CommandText = "insert into Questions (Qid, Question, Hasimage, Subject, SClass, QType, Marks,QDesc, Topic, SubTopic, SheetType, QName) values(@Qid, @Question, @Hasimage, @Subject, @SClass, @QType, @Marks,@QDesc, @Topic, @SubTopic, @SheetType, @QName)";
+            cmd.CommandText = "insert into Questions (Qid, Question, Hasimage, Subject, SClass, QType, Marks,QDesc, Topic, SubTopic, SheetType, QName, Qheading) values(@Qid, @Question, @Hasimage, @Subject, @SClass, @QType, @Marks,@QDesc, @Topic, @SubTopic, @SheetType, @QName, @Qheading)";
             cmd.Parameters.AddWithValue("@Qid", question.Qid);
             cmd.Parameters.AddWithValue("@Question", question.Question);
             cmd.Parameters.AddWithValue("@Hasimage", question.HasImage);
@@ -141,6 +140,10 @@ namespace EasyWordDoc_DBResoration.Repo
             cmd.Parameters.AddWithValue("@Marks", question.Mark);
             cmd.Parameters.AddWithValue("@Topic", RemoveEndDot(question.Topic));
             cmd.Parameters.AddWithValue("@SheetType", question.SheetType);
+
+            cmd.Parameters.AddWithValue("@SubTopic", string.Empty);
+            cmd.Parameters.AddWithValue("@QName", string.Empty);
+            cmd.Parameters.AddWithValue("@Qheading", string.Empty);
             cmd.ExecuteNonQuery();
         }
         public static void InsertImagesItem(SqlConnection gc, QuestionModel question)
