@@ -20,6 +20,9 @@ namespace EasyWordDoc_DBResoration
         static List<TestModel> TestList = new List<TestModel>();
         static void Main(string[] args)
         {
+            con1.Open();
+            con2.Open();
+
             Process();
             Console.ReadKey();
         }
@@ -62,14 +65,14 @@ namespace EasyWordDoc_DBResoration
                 {
                     foreach (QuestionModel Q_Item in T_Item.QuestionList)
                     {
-                        WordProcessRepo.InsertQuestionItem(Q_Item);
-                        WordProcessRepo.InsertImagesItem(Q_Item);
+                        WordProcessRepo.InsertQuestionItem(con2, Q_Item);
+                        WordProcessRepo.InsertImagesItem(con2, Q_Item);
                         if (Q_Item.XpsByteData.Length > 0)
-                            WordProcessRepo.InsertXpsItem(Q_Item);
-                        WordProcessRepo.InsertQuestionOrigin(T_Item.TestID, Q_Item.Qid);
-                        WordProcessRepo.InsertTestInfo(T_Item.TestID, Q_Item.Grade, Q_Item.Subject, Q_Item.Qid);
+                            WordProcessRepo.InsertXpsItem(con2, Q_Item);
+                        WordProcessRepo.InsertQuestionOrigin(con2, T_Item.TestID, Q_Item.Qid);
+                        WordProcessRepo.InsertTestInfo(con2, T_Item.TestID, Q_Item.Grade, Q_Item.Subject, Q_Item.Qid);
                     }
-                    WordProcessRepo.InsertIsHeadingUpdate(T_Item.TestID, false);
+                    WordProcessRepo.InsertIsHeadingUpdate(con2, T_Item.TestID, false);
                     Console.WriteLine("OK");
                 }
                 catch(Exception ex)
