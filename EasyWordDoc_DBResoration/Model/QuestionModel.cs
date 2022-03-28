@@ -21,6 +21,7 @@ namespace EasyWordDoc_DBResoration.Model
         public string Topic { get; set; }
         public string SheetType { get; set; }
         public List<ImageModel> ImageList { get; set; }
+        public byte[] XpsByteData { get; set; }
 
         public QuestionModel()
         {

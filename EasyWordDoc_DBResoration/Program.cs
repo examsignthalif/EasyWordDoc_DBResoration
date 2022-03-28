@@ -11,22 +11,71 @@ namespace EasyWordDoc_DBResoration
 {
     class Program
     {
+        static List<TestModel> TestList = new List<TestModel>();
         static void Main(string[] args)
         {
-            List<TestModel> TestQuestionList = new List<TestModel>();
-            List<QuestionModel> QList = WordProcessRepo.GetAllQuestion("00077");
+            
+        }
 
-            WordTools tool = new WordTools();
+        void Process()
+        {
+            // 1. Get all TestId for a class : 7
+            // 2. Now get all Question for TestId list.
 
-            // Generate as word file.
-            List<FileItem> CurrentTestPath = new List<FileItem>();
-            foreach(QuestionModel item in QList)
+            // 3. Each TestId == FileId
+
+            // 4. Insert Question
+            // 5. Insert ImageTable
+            // 6. Insert XpsTable
+            // 7. Insert QuestionOrigin
+            // 8. Modify Insert TestInfo
+            // 9. Insert IsHeadingUpdate
+            CollectQuestion(5);
+            ReStoreProcess();
+        }
+        void CollectQuestion(int givenGrade)
+        {
+            List<string> TestIdList = WordProcessRepo.GetAllTestIdForGrade(givenGrade);
+            foreach (string testId in TestIdList)
             {
-                // after generated word record the file path to convert as xpsDocument.
-                if (item.HasImage)
-                    CurrentTestPath.Add(tool.Generate_WordDoc_Image(item));
-                else
-                    CurrentTestPath.Add(tool.Generate_WordDoc(item));
+                TestModel obj = new TestModel();
+                obj.TestID = testId;
+                obj.QuestionList = WordProcessRepo.GetAllQuestionForTestId(testId);
+
+                TestList.Add(obj);
+            }
+        }
+
+        void ReStoreProcess()
+        {
+            List<string> failedTestId = new List<string>();
+            foreach(TestModel T_Item in TestList)
+            {
+                try
+                {
+                    foreach (QuestionModel Q_Item in T_Item.QuestionList)
+                    {
+                        WordProcessRepo.InsertQuestionItem(Q_Item);
+                        WordProcessRepo.InsertImagesItem(Q_Item);
+                        if (Q_Item.XpsByteData.Length > 0)
+                            WordProcessRepo.InsertXpsItem(Q_Item);
+                        WordProcessRepo.InsertQuestionOrigin(T_Item.TestID, Q_Item.Qid);
+                        WordProcessRepo.InsertTestInfo(T_Item.TestID, Q_Item.Grade, Q_Item.Subject, Q_Item.Qid);
+                    }
+                    WordProcessRepo.InsertIsHeadingUpdate(T_Item.TestID, false);
+                    Console.WriteLine("OK");
+                }
+                catch(Exception ex)
+                {
+                    failedTestId.Add(T_Item.TestID);
+                    Console.WriteLine("FAILED:\t"+ ex.Message);
+                }
+            }
+
+            Console.WriteLine("\n");
+            foreach(string failedTest in failedTestId)
+            {
+                Console.WriteLine(failedTest);
             }
         }
     }

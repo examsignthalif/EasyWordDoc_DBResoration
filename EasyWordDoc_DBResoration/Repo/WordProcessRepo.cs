@@ -12,14 +12,14 @@ namespace EasyWordDoc_DBResoration.Repo
     {
         static string ConnectionString = "Data Source=.;Initial Catalog=WordProcess;Integrated Security=True";
 
-        public static List<string> GetAllTestIds()
+        public static List<string> GetAllTestIdForGrade(int grade)
         {
             List<string> toReturn = new List<string>();
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
-                cmd.CommandText = "select Distinct TestId from TestInfo";
+                cmd.CommandText = "select Distinct TestId from TestInfo where QID in (select Qid from Questions where SClass = " + grade + ")";
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -61,7 +61,7 @@ namespace EasyWordDoc_DBResoration.Repo
         }
 
 
-        public static List<QuestionModel> GetAllQuestion(string testId)
+        public static List<QuestionModel> GetAllQuestionForTestId(string testId)
         {
             List<QuestionModel> toReturn = new List<QuestionModel>();
             using (SqlConnection con = new SqlConnection(ConnectionString))
@@ -85,7 +85,7 @@ namespace EasyWordDoc_DBResoration.Repo
                     obj.Topic = reader.GetString(8);
                     obj.SheetType = reader.GetString(9);
                     obj.ImageList = GetImages(obj.Qid);
-
+                    obj.XpsByteData = GetXpsByteData(obj.Qid);
                     toReturn.Add(obj);
                 }
             }
@@ -112,10 +112,29 @@ namespace EasyWordDoc_DBResoration.Repo
             }
             return toReturn;
         }
+        static byte[] GetXpsByteData(int qid)
+        {
+            byte[] toReturn = new byte[0];
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                SqlCommand cmd = new SqlCommand();
+                con.Open();
+                cmd.Connection = con;
+                cmd.CommandText = "select XpsFile from Xpstable where Qid = " + qid + "";
+                try
+                {
+                    toReturn = (byte[])cmd.ExecuteScalar();
+                }
+                catch(Exception ex)
+                {
+                }
+            }
+            return toReturn;
+        }
 
 
         //New Database Insert
-        public static void InsertQuestionItem(int newQuestionId, QuestionModel question)
+        public static void InsertQuestionItem(QuestionModel question)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -123,7 +142,7 @@ namespace EasyWordDoc_DBResoration.Repo
                 con.Open();
                 cmd.Connection = con;
                 cmd.CommandText = "insert into Questions (Qid, Question, Hasimage, Subject, SClass, QType, Marks,QDesc, Topic, SubTopic, SheetType, QName) values(@Qid, @Question, @Hasimage, @Subject, @SClass, @QType, @Marks,@QDesc, @Topic, @SubTopic, @SheetType, @QName)";
-                cmd.Parameters.AddWithValue("@Qid", newQuestionId);
+                cmd.Parameters.AddWithValue("@Qid", question.Qid);
                 cmd.Parameters.AddWithValue("@Question", question.Question);
                 cmd.Parameters.AddWithValue("@Hasimage", question.HasImage);
                 cmd.Parameters.AddWithValue("@Subject", question.Subject);
@@ -136,11 +155,9 @@ namespace EasyWordDoc_DBResoration.Repo
                 cmd.ExecuteNonQuery();
             }
         }
-        public static void InsertImagesItem(int newQuestionId, QuestionModel question)
+        public static void InsertImagesItem(QuestionModel question)
         {
-            List<ImageModel> questionimage = question.ImageList.Where(temp => temp.Qid == question.Qid).ToList();
-
-            foreach (ImageModel image in questionimage)
+            foreach (ImageModel image in question.ImageList)
             {
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
@@ -148,14 +165,14 @@ namespace EasyWordDoc_DBResoration.Repo
                     con.Open();
                     cmd.Connection = con;
                     cmd.CommandText = "insert into imagetable values(@Qid,@imagenumber,@ImageByte)";
-                    cmd.Parameters.AddWithValue("@Qid", newQuestionId);
+                    cmd.Parameters.AddWithValue("@Qid", question.Qid);
                     cmd.Parameters.AddWithValue("@imagenumber", image.ImageNumber);
                     cmd.Parameters.AddWithValue("@ImageByte", image.ImageByteData);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
-        public static void InsertXpsItem(int newQuestionId, byte[] xpsByteData)
+        public static void InsertXpsItem(QuestionModel question)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -163,12 +180,12 @@ namespace EasyWordDoc_DBResoration.Repo
                 con.Open();
                 cmd.Connection = con;
                 cmd.CommandText = "insert into Xpstable (Qid, XpsFile) values(@Qid, @XpsFile)";
-                cmd.Parameters.AddWithValue("@Qid", newQuestionId);
-                cmd.Parameters.AddWithValue("@XpsFile", xpsByteData);
+                cmd.Parameters.AddWithValue("@Qid", question.Qid);
+                cmd.Parameters.AddWithValue("@XpsFile", question.XpsByteData);
                 cmd.ExecuteNonQuery();
             }
         }
-        public static bool InsertQuestionOrigin(int fileId, int qid)
+        public static bool InsertQuestionOrigin(string fileId, int qid)
         {
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
@@ -184,6 +201,34 @@ namespace EasyWordDoc_DBResoration.Repo
                     return true;
                 }
                 catch (Exception ex) { return false; }
+            }
+        }
+        public static void InsertTestInfo(string newTestId, string grade, string subject, int qid)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                SqlCommand cmd = new SqlCommand();
+                con.Open();
+                cmd.Connection = con;
+                cmd.CommandText = "insert into TestInfo(TestId, Grade, Subject, Qid) values(@TestId, @Grade, @Subject, @Qid)";
+                cmd.Parameters.AddWithValue("@TestId", newTestId);
+                cmd.Parameters.AddWithValue("@Grade", grade);
+                cmd.Parameters.AddWithValue("@Subject", subject);
+                cmd.Parameters.AddWithValue("@Qid", qid);
+                cmd.ExecuteNonQuery();
+            }
+        }
+        public static void InsertIsHeadingUpdate(string fileId, bool status)
+        {
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            {
+                SqlCommand cmd = new SqlCommand();
+                con.Open();
+                cmd.Connection = con;
+                cmd.CommandText = "insert into IsHeadingUpdate (FileId, IsUpdate) values (@FileId, @IsUpdate)";
+                cmd.Parameters.AddWithValue("@FileId", fileId);
+                cmd.Parameters.AddWithValue("@IsUpdate", status);
+                cmd.ExecuteNonQuery();
             }
         }
         public static void BackUpQuestionFile(int grade, string subject, string fileName, byte[] fileBytes)
