@@ -53,7 +53,7 @@ namespace EasyWordDoc_DBResoration.Repo
         public static List<QuestionModel> GetAllQuestionForTestId(string testId)
         {
             List<QuestionModel> toReturn = new List<QuestionModel>();
-
+            List<int> qidList = new List<int>();
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
                 con.Open();
@@ -65,18 +65,23 @@ namespace EasyWordDoc_DBResoration.Repo
                 {
                     QuestionModel obj = new QuestionModel();
                     obj.Qid = reader.GetInt32(0);
-                    obj.Question = reader.GetString(1);
-                    obj.HasImage = reader.GetBoolean(2);
-                    obj.Subject = reader.GetString(3);
-                    obj.Grade = reader.GetString(4);
-                    obj.QType = reader.GetString(5);
-                    obj.Mark = reader.GetInt32(6);
-                    obj.Heading = reader.GetString(7);
-                    obj.Topic = reader.GetString(8);
-                    obj.SheetType = reader.GetString(9);
-                    obj.ImageList = GetImages(obj.Qid);
-                    obj.XpsByteData = GetXpsByteData(obj.Qid);
-                    toReturn.Add(obj);
+
+                    if(!qidList.Contains(obj.Qid))
+                    {
+                        qidList.Add(obj.Qid);
+                        obj.Question = reader.GetString(1);
+                        obj.HasImage = reader.GetBoolean(2);
+                        obj.Subject = reader.GetString(3);
+                        obj.Grade = reader.GetString(4);
+                        obj.QType = reader.GetString(5);
+                        obj.Mark = reader.GetInt32(6);
+                        obj.Heading = reader.GetString(7);
+                        obj.Topic = reader.GetString(8);
+                        obj.SheetType = reader.GetString(9);
+                        obj.ImageList = GetImages(obj.Qid);
+                        obj.XpsByteData = GetXpsByteData(obj.Qid);
+                        toReturn.Add(obj);
+                    }
                 }
             }
             return toReturn;
