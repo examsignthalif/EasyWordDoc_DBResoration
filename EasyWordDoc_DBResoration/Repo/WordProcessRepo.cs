@@ -18,6 +18,7 @@ namespace EasyWordDoc_DBResoration.Repo
             List<string> toReturn = new List<string>();
             using(SqlConnection con = new SqlConnection(ConnectionString))
             {
+                con.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
                 cmd.CommandText = "select Distinct TestId from TestInfo where QID in (select Qid from Questions where SClass = " + grade + ")";
@@ -55,6 +56,7 @@ namespace EasyWordDoc_DBResoration.Repo
 
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
+                con.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
                 cmd.CommandText = "select Qid, Question, Hasimage, Subject, SClass, QType, Marks, QDesc, Topic, SheetType from Questions where Qid in (select QID from TestInfo where TestId = '" + testId + "')";
@@ -84,6 +86,7 @@ namespace EasyWordDoc_DBResoration.Repo
             List<ImageModel> toReturn = new List<ImageModel>();
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
+                con.Open();
                 SqlCommand cmd = new SqlCommand();
                 con.Open();
                 cmd.Connection = con;
@@ -105,6 +108,7 @@ namespace EasyWordDoc_DBResoration.Repo
             byte[] toReturn = new byte[0];
             using (SqlConnection con = new SqlConnection())
             {
+                con.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
                 cmd.CommandText = "select XpsFile from Xpstable where Qid = " + qid + "";
