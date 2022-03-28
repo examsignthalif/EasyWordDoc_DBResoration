@@ -49,26 +49,41 @@ namespace EasyWordDoc_DBResoration.Repo
             return (toReturn + 1);
         }
 
-
-        public static List<QuestionModel> GetAllQuestionForTestId(string testId)
+        static List<int> GetQuestionIdList(string testId)
         {
-            List<QuestionModel> toReturn = new List<QuestionModel>();
-            List<int> qidList = new List<int>();
+            List<int> toReturn = new List<int>();
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
                 con.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
-                cmd.CommandText = "select Qid, Question, Hasimage, Subject, SClass, QType, Marks, QDesc, Topic, SheetType from Questions where Qid in (select QID from TestInfo where TestId = '" + testId + "')";
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+                cmd.CommandText = "select distinct QID from TestInfo where TestId = '" + testId + "'";
+                SqlDataReader dr = cmd.ExecuteReader();
+                while(dr.Read())
                 {
-                    QuestionModel obj = new QuestionModel();
-                    obj.Qid = reader.GetInt32(0);
+                    toReturn.Add(dr.GetInt32(0));
+                }
+            }
+            return toReturn;
+        }
 
-                    if(!qidList.Contains(obj.Qid))
+        public static List<QuestionModel> GetAllQuestionForTestId(List<int> questionIdList)
+        {
+            List<QuestionModel> toReturn = new List<QuestionModel>();
+
+            foreach(int qid in questionIdList)
+            {
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = con;
+                    cmd.CommandText = "select Qid, Question, Hasimage, Subject, SClass, QType, Marks, QDesc, Topic, SheetType from Questions where Qid = " + qid + "";
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
                     {
-                        qidList.Add(obj.Qid);
+                        QuestionModel obj = new QuestionModel();
+                        obj.Qid = reader.GetInt32(0);
                         obj.Question = reader.GetString(1);
                         obj.HasImage = reader.GetBoolean(2);
                         obj.Subject = reader.GetString(3);
