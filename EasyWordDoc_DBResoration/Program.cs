@@ -76,7 +76,7 @@ namespace EasyWordDoc_DBResoration
                         WordProcessRepo.InsertTestInfo(con2, NewTestId.ToString(), Q_Item.Grade, Q_Item.Subject, NewQid);
                     }
                     WordProcessRepo.InsertIsHeadingUpdate(con2, NewTestId.ToString(), false);
-                    Console.WriteLine("OK");
+                    Console.WriteLine("OK\t- "+ NewTestId.ToString());
                 }
                 catch(Exception ex)
                 {
