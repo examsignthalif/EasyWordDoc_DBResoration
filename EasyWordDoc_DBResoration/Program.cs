@@ -42,6 +42,7 @@ namespace EasyWordDoc_DBResoration
             // 9. Insert IsHeadingUpdate
             CollectQuestion(5);
             ReStoreProcess();
+            Console.WriteLine("Completed..!");
         }
         static void CollectQuestion(int givenGrade)
         {
