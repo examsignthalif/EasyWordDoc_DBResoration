@@ -18,7 +18,7 @@ namespace EasyWordDoc_DBResoration
         static SqlConnection con2 = new SqlConnection(ConnectionString2);
 
         static List<TestModel> TestList = new List<TestModel>();
-        static int Grade = 6;
+        static int Grade = 7;
         static void Main(string[] args)
         {
             con1.Open();

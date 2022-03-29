@@ -149,8 +149,8 @@ namespace EasyWordDoc_DBResoration.Repo
             SqlConnection con = gc;
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = con;
-            cmd.CommandText = "select count(*) from TestInfo";
-            int count = (int)cmd.ExecuteScalar();
+            cmd.CommandText = "select COUNT(distinct TestId) from TestInfo";
+            int count =(int)cmd.ExecuteScalar();
             return count;
         }
         public static int GetAllQuestionCount(SqlConnection gc)
@@ -264,10 +264,22 @@ namespace EasyWordDoc_DBResoration.Repo
 
         static string RemoveEndDot(string givenString)
         {
-            if (givenString[givenString.Length - 1] == '.')
-                return givenString.Substring(0, givenString.Length - 2).Trim();
-            else
-                return givenString.Trim();
+            try
+            {
+                if (givenString.Length > 0)
+                {
+                    if (givenString[givenString.Length - 1] == '.')
+                        return givenString.Substring(0, givenString.Length - 2).Trim();
+                    else
+                        return givenString.Trim();
+                }
+                else
+                    return givenString;
+            }
+            catch (Exception ex) 
+            {
+                return givenString;
+            }
         }
     }
 }
