@@ -70,14 +70,44 @@ namespace EasyWordDoc_DBResoration
                     foreach (QuestionModel Q_Item in T_Item.QuestionList)
                     {
                         NewQid++;
-                        WordProcessRepo.InsertQuestionItem(con2, NewQid, Q_Item);
-                        WordProcessRepo.InsertImagesItem(con2, NewQid, Q_Item);
+                        try
+                        { WordProcessRepo.InsertQuestionItem(con2, NewQid, Q_Item); }
+                        catch (Exception ex) 
+                        {
+                        }
+                        try
+                        { WordProcessRepo.InsertImagesItem(con2, NewQid, Q_Item); }
+                        catch (Exception ex) 
+                        { 
+                        }
                         if (Q_Item.XpsByteData != null)
-                            WordProcessRepo.InsertXpsItem(con2, NewQid, Q_Item);
-                        WordProcessRepo.InsertQuestionOrigin(con2, NewTestId.ToString(), NewQid);
-                        WordProcessRepo.InsertTestInfo(con2, NewTestId.ToString(), Q_Item.Grade, Q_Item.Subject, NewQid);
+                        {
+                            try
+                            { WordProcessRepo.InsertXpsItem(con2, NewQid, Q_Item); }
+                            catch (Exception ex) 
+                            {
+                            }
+                        }
+                            
+                        try
+                        { WordProcessRepo.InsertQuestionOrigin(con2, NewTestId.ToString(), NewQid); }
+                        catch (Exception ex) 
+                        { 
+                        }
+                        try
+                        { WordProcessRepo.InsertTestInfo(con2, NewTestId.ToString(), Q_Item.Grade, Q_Item.Subject, NewQid); }
+                        catch (Exception ex) 
+                        {
+                        }
                     }
-                    WordProcessRepo.InsertIsHeadingUpdate(con2, NewTestId.ToString(), false);
+                    try
+                    {
+                        WordProcessRepo.InsertIsHeadingUpdate(con2, NewTestId.ToString(), false);
+                    }
+                    catch
+                    {
+
+                    }
                     Console.WriteLine("OK\t- "+ NewTestId.ToString());
                 }
                 catch(Exception ex)
