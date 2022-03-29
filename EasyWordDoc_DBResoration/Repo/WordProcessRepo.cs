@@ -35,18 +35,17 @@ namespace EasyWordDoc_DBResoration.Repo
             int toReturn = 0;
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
-                
-            }
-            SqlCommand cmd = new SqlCommand();
+                SqlCommand cmd = new SqlCommand();
 
-            cmd.CommandText = "select FileId from UploadedQuestionFile order by FileId desc";
-            SqlDataReader dr = cmd.ExecuteReader();
-            while (dr.Read())
-            {
-                toReturn = dr.GetInt32(0);
-                break;
+                cmd.CommandText = "select FileId from UploadedQuestionFile order by FileId desc";
+                SqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    toReturn = dr.GetInt32(0);
+                    break;
+                }
+                return (toReturn + 1);
             }
-            return (toReturn + 1);
         }
 
         public static List<string> GetQuestionIdList(string testId)
@@ -143,14 +142,34 @@ namespace EasyWordDoc_DBResoration.Repo
         }
 
 
+
+        public static int GetAllTestCount(SqlConnection gc)
+        {
+            SqlConnection con = gc;
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "select count(*) from TestInfo";
+            int count = (int)cmd.ExecuteScalar();
+            return count;
+        }
+        public static int GetAllQuestionCount(SqlConnection gc)
+        {
+            SqlConnection con = gc;
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = con;
+            cmd.CommandText = "select count(*) from Questions";
+            int count = (int)cmd.ExecuteScalar();
+            return count;
+        }
+
         //New Database Insert
-        public static void InsertQuestionItem(SqlConnection gc, QuestionModel question)
+        public static void InsertQuestionItem(SqlConnection gc, int newQid, QuestionModel question)
         {
             SqlConnection con = gc;
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = con;
             cmd.CommandText = "insert into Questions (Qid, Question, Hasimage, Subject, SClass, QType, Marks,QDesc, Topic, SubTopic, SheetType, QName, Qheading) values(@Qid, @Question, @Hasimage, @Subject, @SClass, @QType, @Marks,@QDesc, @Topic, @SubTopic, @SheetType, @QName, @Qheading)";
-            cmd.Parameters.AddWithValue("@Qid", question.Qid);
+            cmd.Parameters.AddWithValue("@Qid", newQid);
             cmd.Parameters.AddWithValue("@Question", question.Question);
             cmd.Parameters.AddWithValue("@Hasimage", question.HasImage);
             cmd.Parameters.AddWithValue("@Subject", question.Subject);
@@ -166,7 +185,7 @@ namespace EasyWordDoc_DBResoration.Repo
             cmd.Parameters.AddWithValue("@Qheading", string.Empty);
             cmd.ExecuteNonQuery();
         }
-        public static void InsertImagesItem(SqlConnection gc, QuestionModel question)
+        public static void InsertImagesItem(SqlConnection gc, int newQid, QuestionModel question)
         {
             foreach (ImageModel image in question.ImageList)
             {
@@ -174,30 +193,30 @@ namespace EasyWordDoc_DBResoration.Repo
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
                 cmd.CommandText = "insert into imagetable values(@Qid,@imagenumber,@ImageByte)";
-                cmd.Parameters.AddWithValue("@Qid", question.Qid);
+                cmd.Parameters.AddWithValue("@Qid", newQid);
                 cmd.Parameters.AddWithValue("@imagenumber", image.ImageNumber);
                 cmd.Parameters.AddWithValue("@ImageByte", image.ImageByteData);
                 cmd.ExecuteNonQuery();
             }
         }
-        public static void InsertXpsItem(SqlConnection gc, QuestionModel question)
+        public static void InsertXpsItem(SqlConnection gc, int newQid, QuestionModel question)
         {
             SqlConnection con = gc;
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = con;
             cmd.CommandText = "insert into Xpstable (Qid, XpsFile) values(@Qid, @XpsFile)";
-            cmd.Parameters.AddWithValue("@Qid", question.Qid);
+            cmd.Parameters.AddWithValue("@Qid", newQid);
             cmd.Parameters.AddWithValue("@XpsFile", question.XpsByteData);
             cmd.ExecuteNonQuery();
         }
-        public static bool InsertQuestionOrigin(SqlConnection gc, string fileId, int qid)
+        public static bool InsertQuestionOrigin(SqlConnection gc, string fileId, int newQid)
         {
             SqlConnection con = gc;
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = con;
             cmd.CommandText = "insert into QuestionOrigin(FileId, Qid) values (@FileId, @Qid)";
             cmd.Parameters.AddWithValue("@FileId", fileId);
-            cmd.Parameters.AddWithValue("@Qid", qid);
+            cmd.Parameters.AddWithValue("@Qid", newQid);
             try
             {
                 cmd.ExecuteNonQuery();
@@ -205,7 +224,7 @@ namespace EasyWordDoc_DBResoration.Repo
             }
             catch (Exception ex) { return false; }
         }
-        public static void InsertTestInfo(SqlConnection gc, string newTestId, string grade, string subject, int qid)
+        public static void InsertTestInfo(SqlConnection gc, string newTestId, string grade, string subject, int newQid)
         {
             SqlConnection con = gc;
             SqlCommand cmd = new SqlCommand();
@@ -214,7 +233,7 @@ namespace EasyWordDoc_DBResoration.Repo
             cmd.Parameters.AddWithValue("@TestId", newTestId);
             cmd.Parameters.AddWithValue("@Grade", grade);
             cmd.Parameters.AddWithValue("@Subject", subject);
-            cmd.Parameters.AddWithValue("@Qid", qid);
+            cmd.Parameters.AddWithValue("@Qid", newQid);
             cmd.ExecuteNonQuery();
         }
         public static void InsertIsHeadingUpdate(SqlConnection gc, string fileId, bool status)

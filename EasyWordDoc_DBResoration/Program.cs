@@ -58,34 +58,30 @@ namespace EasyWordDoc_DBResoration
 
         static void ReStoreProcess()
         {
-            List<string> failedTestId = new List<string>();
+            int NewTestId = WordProcessRepo.GetAllTestCount(con2);
+            int NewQid = WordProcessRepo.GetAllQuestionCount(con2);
             foreach(TestModel T_Item in TestList)
             {
                 try
                 {
+                    NewTestId++;
                     foreach (QuestionModel Q_Item in T_Item.QuestionList)
                     {
-                        WordProcessRepo.InsertQuestionItem(con2, Q_Item);
-                        WordProcessRepo.InsertImagesItem(con2, Q_Item);
+                        NewQid++;
+                        WordProcessRepo.InsertQuestionItem(con2, NewQid, Q_Item);
+                        WordProcessRepo.InsertImagesItem(con2, NewQid, Q_Item);
                         if (Q_Item.XpsByteData != null)
-                            WordProcessRepo.InsertXpsItem(con2, Q_Item);
-                        WordProcessRepo.InsertQuestionOrigin(con2, T_Item.TestID, Q_Item.Qid);
-                        WordProcessRepo.InsertTestInfo(con2, T_Item.TestID, Q_Item.Grade, Q_Item.Subject, Q_Item.Qid);
+                            WordProcessRepo.InsertXpsItem(con2, NewQid, Q_Item);
+                        WordProcessRepo.InsertQuestionOrigin(con2, NewTestId.ToString(), NewQid);
+                        WordProcessRepo.InsertTestInfo(con2, NewTestId.ToString(), Q_Item.Grade, Q_Item.Subject, NewQid);
                     }
-                    WordProcessRepo.InsertIsHeadingUpdate(con2, T_Item.TestID, false);
+                    WordProcessRepo.InsertIsHeadingUpdate(con2, NewTestId.ToString(), false);
                     Console.WriteLine("OK");
                 }
                 catch(Exception ex)
                 {
-                    failedTestId.Add(T_Item.TestID);
                     Console.WriteLine("FAILED:\t"+ ex.Message);
                 }
-            }
-
-            Console.WriteLine("\n");
-            foreach(string failedTest in failedTestId)
-            {
-                Console.WriteLine(failedTest);
             }
         }
     }
