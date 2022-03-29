@@ -49,9 +49,9 @@ namespace EasyWordDoc_DBResoration.Repo
             return (toReturn + 1);
         }
 
-        static List<int> GetQuestionIdList(string testId)
+        public static List<string> GetQuestionIdList(string testId)
         {
-            List<int> toReturn = new List<int>();
+            List<string> toReturn = new List<string>();
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
                 con.Open();
@@ -61,17 +61,17 @@ namespace EasyWordDoc_DBResoration.Repo
                 SqlDataReader dr = cmd.ExecuteReader();
                 while(dr.Read())
                 {
-                    toReturn.Add(dr.GetInt32(0));
+                    toReturn.Add(dr.GetString(0));
                 }
             }
             return toReturn;
         }
 
-        public static List<QuestionModel> GetAllQuestionForTestId(List<int> questionIdList)
+        public static List<QuestionModel> GetAllQuestionForTestId(List<string> questionIdList)
         {
             List<QuestionModel> toReturn = new List<QuestionModel>();
 
-            foreach(int qid in questionIdList)
+            foreach(string qid in questionIdList)
             {
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {

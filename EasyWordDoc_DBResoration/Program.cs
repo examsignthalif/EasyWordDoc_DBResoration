@@ -50,7 +50,7 @@ namespace EasyWordDoc_DBResoration
             {
                 TestModel obj = new TestModel();
                 obj.TestID = testId;
-                obj.QuestionList = WordProcessRepo.GetAllQuestionForTestId(testId);
+                obj.QuestionList = WordProcessRepo.GetAllQuestionForTestId(WordProcessRepo.GetQuestionIdList(testId));
 
                 TestList.Add(obj);
             }
