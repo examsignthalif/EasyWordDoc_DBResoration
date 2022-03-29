@@ -18,6 +18,7 @@ namespace EasyWordDoc_DBResoration
         static SqlConnection con2 = new SqlConnection(ConnectionString2);
 
         static List<TestModel> TestList = new List<TestModel>();
+        static int Grade = 6;
         static void Main(string[] args)
         {
             con1.Open();
@@ -40,7 +41,7 @@ namespace EasyWordDoc_DBResoration
             // 7. Insert QuestionOrigin
             // 8. Modify Insert TestInfo
             // 9. Insert IsHeadingUpdate
-            CollectQuestion(5);
+            CollectQuestion(Grade);
             ReStoreProcess();
             Console.WriteLine("Completed..!");
         }
